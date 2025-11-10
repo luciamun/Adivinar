@@ -1,5 +1,4 @@
 # Adivinar
 Sigue las pistas, y adivina la canción!
 
-Entrada al juego--> 
-https://luciamunozz.github.io/Adivinar/index.html
+Entrada al juego -->[ADIVINAR11](https://luciamunozz.github.io/Adivinar/index.html)
