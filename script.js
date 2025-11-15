@@ -804,25 +804,29 @@ function reiniciarJuego() {
 btnAdivinar.addEventListener("click", () => {
   if (!cancionSeleccionada) return alert("Primero selecciona una canción.");
 
-  // preguntar UNA VEZ que tipo de cosa quiere adivinar
+  // preguntar UNA VEZ qué tipo quiere adivinar
   const tipoRaw = prompt("¿Qué quieres adivinar? Escribe: cancion, grupo, cantante o album");
-  if (!tipoRaw) return; // cancelado o vacío
+  if (!tipoRaw) return;
   const tipo = norm(tipoRaw);
 
-  // preguntar UNA VEZ el intento según el tipo
-  let intentoRaw;
+  // intentar adivinar canción (ÚNICA QUE PUEDE GANAR Y ÚNICA QUE RESTA VIDA)
   if (["cancion","nombre","song"].includes(tipo)) {
-    intentoRaw = prompt("¿Cuál crees que es la canción?");
+    const intentoRaw = prompt("¿Cuál crees que es la canción?");
     if (!intentoRaw) return;
+
     const intento = norm(intentoRaw);
+
     if (intento === norm(cancionSeleccionada.nombre)) {
+      // única forma de ganar
       abrirModalGanar();
       zonaJuego.classList.add("oculto");
       return;
     } else {
+      // SOLO aquí se restan vidas
       vidas--;
       resultado.textContent = `❌ Incorrecto. Te quedan ${vidas} vidas.`;
       actualizarVidas();
+
       if (vidas === 1) abrirModalPista();
       if (vidas === 0) {
         perder();
@@ -832,71 +836,58 @@ btnAdivinar.addEventListener("click", () => {
     }
   }
 
+  // ==============================
+  // A partir de aquí: NO SE GANA y NO SE RESTA VIDA
+  // ==============================
+
+  // GRUPO
   if (["grupo","band","bandname"].includes(tipo)) {
-    intentoRaw = prompt("¿Cuál es el nombre del grupo?");
+    const intentoRaw = prompt("¿Cuál es el grupo?");
     if (!intentoRaw) return;
+
     const intento = norm(intentoRaw);
-    if (cancionSeleccionada.grupo && intento === norm(cancionSeleccionada.grupo_nombre || "")) {
-      abrirModalGanar();
-      zonaJuego.classList.add("oculto");
-      return;
+    const correcto = cancionSeleccionada.grupo ? norm(cancionSeleccionada.grupo_nombre || "") : "";
+
+    if (intento === correcto) {
+      resultado.textContent = "✔️ Acertaste el grupo, PERO SOLO SE GANA ADIVINANDO LA CANCIÓN.";
     } else {
-      // si la canción no es de un grupo, fallo automático (se considera incorrecto)
-      vidas--;
-      resultado.textContent = `❌ Incorrecto. Te quedan ${vidas} vidas.`;
-      actualizarVidas();
-      if (vidas === 1) abrirModalPista();
-      if (vidas === 0) {
-        perder();
-        setTimeout(() => abrirModalPerder(), 400);
-      }
-      return;
+      resultado.textContent = "❌ No es ese el grupo. (No pierdes vidas)";
     }
+    return;
   }
 
+  // CANTANTE
   if (["cantante","vocal","singer"].includes(tipo)) {
-    intentoRaw = prompt("¿Cuál es el/la cantante?");
+    const intentoRaw = prompt("¿Cuál es el/la cantante?");
     if (!intentoRaw) return;
+
     const intento = norm(intentoRaw);
-    if (!cancionSeleccionada.grupo && intento === norm(cancionSeleccionada.cantante || "")) {
-      abrirModalGanar();
-      zonaJuego.classList.add("oculto");
-      return;
+    const correcto = !cancionSeleccionada.grupo ? norm(cancionSeleccionada.cantante || "") : "";
+
+    if (intento === correcto) {
+      resultado.textContent = "✔️ Acertaste el cantante, PERO SOLO SE GANA ADIVINANDO LA CANCIÓN.";
     } else {
-      vidas--;
-      resultado.textContent = `❌ Incorrecto. Te quedan ${vidas} vidas.`;
-      actualizarVidas();
-      if (vidas === 1) abrirModalPista();
-      if (vidas === 0) {
-        perder();
-        setTimeout(() => abrirModalPerder(), 400);
-      }
-      return;
+      resultado.textContent = "❌ No es ese el/la cantante. (No pierdes vidas)";
     }
+    return;
   }
 
+  // ÁLBUM
   if (["album","disco"].includes(tipo)) {
-    intentoRaw = prompt("¿Cuál es el álbum?");
+    const intentoRaw = prompt("¿Cuál es el álbum?");
     if (!intentoRaw) return;
+
     const intento = norm(intentoRaw);
-    if (intento === norm(cancionSeleccionada.album || "")) {
-      abrirModalGanar();
-      zonaJuego.classList.add("oculto");
-      return;
+    const correcto = norm(cancionSeleccionada.album || "");
+
+    if (intento === correcto) {
+      resultado.textContent = "✔️ Acertaste el álbum, PERO SOLO SE GANA ADIVINANDO LA CANCIÓN.";
     } else {
-      vidas--;
-      resultado.textContent = `❌ Incorrecto. Te quedan ${vidas} vidas.`;
-      actualizarVidas();
-      if (vidas === 1) abrirModalPista();
-      if (vidas === 0) {
-        perder();
-        setTimeout(() => abrirModalPerder(), 400);
-      }
-      return;
+      resultado.textContent = "❌ Ese no es el álbum. (No pierdes vidas)";
     }
+    return;
   }
 
-  // si el tipo no coincide con ninguna opción:
   alert("Tipo no reconocido. Usa: cancion, grupo, cantante o album.");
 });
 
